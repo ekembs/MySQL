@@ -1,0 +1,33 @@
+#AZURE AI Call to Chat GPT and Return
+import requests
+import json
+
+# Replace with your actual values
+endpoint = "https://YOUR_RESOURCE_NAME.openai.azure.com/"
+api_key = "YOUR_API_KEY"
+deployment_name = "YOUR_DEPLOYMENT_NAME"
+api_version = "2023-05-15"
+
+# Define headers and prompt
+headers = {
+    "Content-Type": "application/json",
+    "api-key": api_key
+}
+
+body = {
+    "messages": [
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "What's the capital of France?"}
+    ]
+}
+
+# Make request
+response = requests.post(
+    f"{endpoint}/openai/deployments/{deployment_name}/chat/completions?api-version={api_version}",
+    headers=headers,
+    data=json.dumps(body)
+)
+
+# Output result
+result = response.json()
+print(result["choices"][0]["message"]["content"])
