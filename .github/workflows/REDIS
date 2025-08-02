@@ -1,0 +1,16 @@
+'Doesnt have structured databases but instead numbers
+# Select database number (default is 0)
+SELECT 1
+
+#Add data
+SET user:1000 "Alice"
+HSET user:1001 name "Bob" city "London"
+
+#delete data
+DEL user:1000
+HDEL user:1001 city
+
+#delete database
+FLUSHDB      # Deletes all keys in current database
+FLUSHALL     # Deletes keys from all databases
+
