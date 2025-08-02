@@ -1,0 +1,22 @@
+% Create Bloomberg connection
+c = blp;  % For Bloomberg Desktop API
+
+% Request yield curve data
+curveID = 'YCRV0025 Index';  % US Treasury Actives Curve
+fields = {'MATURITY_DT','YLD_YTM_MID'};
+data = getdata(c, curveID, fields);
+
+% Extract maturity dates and yields
+maturityDates = data.MATURITY_DT;
+yields = data.YLD_YTM_MID;
+
+% Convert dates to numeric years from today
+tenors = years(maturityDates - datetime('today'));
+
+% Plot yield curve
+figure;
+plot(tenors, yields, '-o', 'LineWidth', 2);
+xlabel('Years to Maturity');
+ylabel('Yield (%)');
+title('USD Treasury Yield Curve');
+grid on;
