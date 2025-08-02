@@ -1,0 +1,58 @@
+'Add database
+npm install pg
+
+const { Client } = require('pg');
+
+// Connect to default database to create a new one
+const setupClient = new Client({
+  user: 'your_user',
+  password: 'your_password',
+  host: 'localhost',
+  port: 5432,
+  database: 'postgres' // default admin DB
+});
+
+setupClient.connect()
+  .then(() => setupClient.query('CREATE DATABASE sample_db'))
+  .then(() => {
+    setupClient.end();
+
+    // Now connect to sample_db
+    const dbClient = new Client({
+      user: 'your_user',
+      password: 'your_password',
+      host: 'localhost',
+      port: 5432,
+      database: 'sample_db'
+    });
+
+    return dbClient.connect()
+      .then(() => dbClient.query(`
+        CREATE TABLE users (
+          id SERIAL PRIMARY KEY,
+          name VARCHAR(100),
+          city VARCHAR(100)
+        );
+      `))
+      .then(() => dbClient.query(`
+        INSERT INTO users (name, city)
+        VALUES ('Alice', 'London'), ('Bob', 'Manchester');
+      `))
+      .then(() => dbClient.query(`DELETE FROM users WHERE name = 'Bob'`))
+      .then(() => dbClient.end())
+      .then(() => {
+        // Drop DB from outside again
+        const finalClient = new Client({
+          user: 'your_user',
+          password: 'your_password',
+          host: 'localhost',
+          port: 5432,
+          database: 'postgres'
+        });
+
+        return finalClient.connect()
+          .then(() => finalClient.query('DROP DATABASE sample_db'))
+          .then(() => finalClient.end());
+      });
+  })
+  .catch(err => console.error('Error:', err));
