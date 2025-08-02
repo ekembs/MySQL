@@ -1,0 +1,12 @@
+MySQL
+1)Insert
+INSERT INTO company_db.employees (id, name, department)
+VALUES (1, 'Alice', 'Sales'),
+       (2, 'Bob', 'Marketing');
+2)Select, Join
+-- Example structure
+-- payroll_db.salaries (emp_id INT, salary DECIMAL)
+SELECT e.name, e.department, s.salary
+FROM company_db.employees AS e
+JOIN payroll_db.salaries AS s
+  ON e.id = s.emp_id;
