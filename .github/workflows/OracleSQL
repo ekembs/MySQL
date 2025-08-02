@@ -1,0 +1,24 @@
+--ORACLE SQL
+-- Create a database (called a schema in Oracle)
+CREATE USER sales_db IDENTIFIED BY password;
+GRANT CONNECT, RESOURCE TO sales_db;
+
+-- Create table
+CREATE TABLE sales_db.customers (
+  id NUMBER PRIMARY KEY,
+  name VARCHAR2(100),
+  city VARCHAR2(100)
+);
+
+-- Insert data
+INSERT INTO sales_db.customers (id, name, city)
+VALUES (1, 'Alice', 'London'),
+       (2, 'Bob', 'Manchester');
+
+-- Delete data
+DELETE FROM sales_db.customers WHERE name = 'Bob';
+
+-- Join data from another schema (assuming another schema called marketing_db with a table leads)
+SELECT c.name, l.lead_source
+FROM sales_db.customers c
+JOIN marketing_db.leads l ON c.id = l.customer_id;
