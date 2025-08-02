@@ -1,0 +1,52 @@
+'Add Database
+npm install aws-sdk
+
+const AWS = require('aws-sdk');
+AWS.config.update({ region: 'us-east-1' }); // Adjust region as needed
+
+const dynamodb = new AWS.DynamoDB();
+const docClient = new AWS.DynamoDB.DocumentClient();
+
+// Create table
+const createParams = {
+  TableName: 'Users',
+  KeySchema: [{ AttributeName: 'user_id', KeyType: 'HASH' }],
+  AttributeDefinitions: [{ AttributeName: 'user_id', AttributeType: 'S' }],
+  ProvisionedThroughput: { ReadCapacityUnits: 5, WriteCapacityUnits: 5 }
+};
+
+dynamodb.createTable(createParams, (err, data) => {
+  if (err) console.error("Error:", err);
+  else {
+    console.log("Created table.");
+
+    // Add data
+    const itemParams = {
+      TableName: 'Users',
+      Item: { user_id: '1001', name: 'Alice', city: 'London' }
+    };
+    docClient.put(itemParams, (err) => {
+      if (err) console.error("Add Error:", err);
+      else {
+        // Delete data
+        const deleteParams = {
+          TableName: 'Users',
+          Key: { user_id: '1001' }
+        };
+        docClient.delete(deleteParams, (err) => {
+          if (err) console.error("Delete Error:", err);
+          else {
+            // Delete table (database equivalent)
+            dynamodb.deleteTable({ TableName: 'Users' }, (err) => {
+              if (err) console.error("Delete Table Error:", err);
+              else console.log("Deleted table.");
+            });
+          }
+        });
+      }
+    });
+  }
+});
+
+
+
