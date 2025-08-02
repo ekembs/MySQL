@@ -1,0 +1,23 @@
+##DATABRICKS, PYTHON 
+# Create a DataFrame and save it as a table
+data = [(1, 'Alice', 'London'), (2, 'Bob', 'Manchester')]
+df = spark.createDataFrame(data, ['id', 'name', 'city'])
+df.write.format("delta").saveAsTable("sales.customers")
+
+# Insert more data
+spark.sql("""
+  INSERT INTO sales.customers
+  VALUES (3, 'Charlie', 'Bristol')
+""")
+
+# Delete data
+spark.sql("""
+  DELETE FROM sales.customers WHERE name = 'Bob'
+""")
+
+# Join with another table in a separate database
+spark.sql("""
+  SELECT c.name, l.source
+  FROM sales.customers AS c
+  JOIN marketing.leads AS l ON c.id = l.customer_id
+""")
