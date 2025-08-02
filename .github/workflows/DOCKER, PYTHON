@@ -1,0 +1,26 @@
+##1)Write Python file that runs in Docker
+import os
+
+print("🧠 Running inside container...")
+print(f"Process ID: {os.getpid()}")
+print(f"Hostname: {os.uname().nodename}")
+
+# Show namespace info
+print("🔍 Namespace Info:")
+with open("/proc/self/ns/mnt") as f:
+    print(f.read())
+
+## 2)Run code in Docker
+
+FROM python:3.10-slim
+
+WORKDIR /app
+COPY script.py .
+
+CMD ["python", "script.py"]
+
+## 3) Commandline
+
+docker run --rm --cap-add=SYS_PTRACE --cap-add=SYS_ADMIN my-container
+
+
