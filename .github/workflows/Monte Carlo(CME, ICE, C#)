@@ -1,0 +1,55 @@
+#Get data from CME, ICE and do monte carlo valuation in C#
+### 1) Connect to CME or ICE
+using System.Net.Http;
+
+async Task<string> GetMarketDataAsync(string url, string apiKey)
+{
+    using var client = new HttpClient();
+    client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
+
+    var response = await client.GetAsync("ICE API ACCESS URL");
+    response.EnsureSuccessStatusCode();
+
+    return await response.Content.ReadAsStringAsync(); // JSON payload
+}
+
+####################################
+##2) C# Code
+
+using System;
+using System.Net.Http;
+using System.Threading.Tasks;
+
+class MonteCarloValuation
+{
+    static async Task Main()
+    {
+        int simulations = 10000;
+        double initialPrice = 100.0;
+        double volatility = 0.2;
+        double riskFreeRate = 0.01;
+        double time = 1.0; // 1 year
+        double strike = 100.0;
+        double[] payoffs = new double[simulations];
+
+        Random rand = new Random();
+
+        // Monte Carlo loop
+        for (int i = 0; i < simulations; i++)
+        {
+            double gauss = Math.Sqrt(-2.0 * Math.Log(rand.NextDouble())) *
+                           Math.Cos(2.0 * Math.PI * rand.NextDouble());
+
+            double priceAtMaturity = initialPrice * 
+                                     Math.Exp((riskFreeRate - 0.5 * volatility * volatility) * time 
+                                     + volatility * Math.Sqrt(time) * gauss);
+
+            payoffs[i] = Math.Max(priceAtMaturity - strike, 0); // Call option payoff
+        }
+
+        double optionPrice = Math.Exp(-riskFreeRate * time) * 
+                             (payoffs.Sum() / simulations);
+
+        Console.WriteLine($"Monte Carlo Estimated Option Price: {optionPrice:F2}");
+    }
+}
